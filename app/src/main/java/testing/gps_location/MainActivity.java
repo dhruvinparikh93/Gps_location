@@ -1,6 +1,7 @@
 package testing.gps_location;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                t.append("\n " + location.getLongitude() + " " + location.getLatitude());
+                t.setText("\n " + location.getLongitude() + " " + location.getLatitude());
             }
 
             @Override
@@ -68,10 +69,9 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case 10:
+                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     configure_button();
-                break;
-            default:
-                break;
+                    return;
         }
     }
 
@@ -79,19 +79,21 @@ public class MainActivity extends AppCompatActivity {
         // first check for permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.INTERNET}
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.INTERNET}
                         ,10);
             }
             return;
         }
         // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //noinspection MissingPermission
-                locationManager.requestLocationUpdates("gps", 5000, 0, listener);
-            }
-        });
+ b.setOnClickListener(new View.OnClickListener() {
+     @SuppressLint("MissingPermission")
+     @Override
+     public void onClick(View view) {
+         locationManager.requestLocationUpdates("gps",500,0,listener);
+     }
+ });
     }
 }
 
